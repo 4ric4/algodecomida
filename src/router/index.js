@@ -2,57 +2,41 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 // Layouts
-import MainLayout from '../views/layouts/MainLayout.vue'
 import AuthLayout from '../views/layouts/AuthLayout.vue'
 
-// Auth Pages
+// Pages
 import LoginView from '../views/pages/auth/LoginView.vue'
 import RegisterView from '../views/pages/auth/RegisterView.vue'
 import OnboardingView from '../views/pages/auth/OnboardingView.vue'
 
-// Main Pages
 import HomePageView from '../views/pages/home/HomePageView.vue'
 import DiscoverView from '../views/pages/discover/DiscoverView.vue'
 import RestaurantDetailView from '../views/pages/restaurants/RestaurantDetailView.vue'
 import CreateReviewView from '../views/pages/reviews/CreateReviewView.vue'
 import ProfileView from '../views/pages/profile/ProfileView.vue'
-import NotificationsView from '../views/pages/notifications/NotificationsView.vue'
 import LandingView from '../views/pages/landing/LandingView.vue'
 import FeedView from '../views/pages/feed/FeedView.vue'
 
 const routes = [
-  // Landing Route (For unauthenticated users)
+  // Landing
   {
     path: '/landing',
     name: 'Landing',
-    component: LandingView,
-    meta: { requiresAuth: false }
+    component: LandingView
   },
 
-  // Auth Routes
+  // Auth
   {
     path: '/auth',
     component: AuthLayout,
     children: [
-      {
-        path: 'login',
-        name: 'Login',
-        component: LoginView
-      },
-      {
-        path: 'register',
-        name: 'Register',
-        component: RegisterView
-      },
-      {
-        path: 'onboarding',
-        name: 'Onboarding',
-        component: OnboardingView
-      }
+      { path: 'login', name: 'Login', component: LoginView },
+      { path: 'register', name: 'Register', component: RegisterView },
+      { path: 'onboarding', name: 'Onboarding', component: OnboardingView }
     ]
   },
 
-  // Home Route (Dark, no layout)
+  // Home
   {
     path: '/',
     name: 'Home',
@@ -60,37 +44,22 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
-  // Profile Routes (must be BEFORE wildcard)
+  // Profile com username
   {
     path: '/profile/:username',
     name: 'Profile',
     component: ProfileView,
     meta: { requiresAuth: true }
   },
+
+  // Profile sem username (redireciona)
   {
     path: '/profile',
-    name: 'MyProfile', // Renomeado para clareza
-    beforeEnter: async (to, from, next) => {
-      const authStore = useAuthStore()
-      
-      // Garante que a autenticação foi inicializada
-      if (!authStore.isLoggedIn) {
-        await authStore.initializeAuth()
-      }
-      
-      // Agora redireciona para o perfil do usuário logado
-      if (authStore.isLoggedIn && authStore.user?.username) {
-        console.log('Redirecionando para perfil do usuário:', authStore.user.username)
-        next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
-      } else {
-        console.log('Usuário não autenticado, redirecionando para login')
-        next({ name: 'Login' })
-      }
-    },
+    name: 'MyProfile',
     meta: { requiresAuth: true }
   },
 
-  // Dark Pages (Independent routes without MainLayout)
+  // Outras páginas
   {
     path: '/discover',
     name: 'Discover',
@@ -110,53 +79,55 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/restaurants/:id',
-    name: 'RestaurantDetailAlt',
-    component: RestaurantDetailView,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/review/new',
     name: 'CreateReview',
     component: CreateReviewView,
     meta: { requiresAuth: true }
   },
-  {
-    path: '/review/new/:restaurantId',
-    name: 'CreateReviewForRestaurant',
-    component: CreateReviewView,
-    meta: { requiresAuth: true }
-  },
 
-  // Fallback
+  // fallback
   {
     path: '/:pathMatch(.*)*',
-    redirect: { name: 'Home' }
+    redirect: '/'
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes
 })
 
-// Navigation Guard
+// 🔥 GUARD COMPLETO
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
-  // Inicializar autentica��o na primeira navega��o
-  if (!from.name) {
+  // inicializa auth sempre na primeira vez
+  if (!authStore.initialized) {
     await authStore.initializeAuth()
   }
 
-  if (requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'Login' })
-  } else if (to.path.startsWith('/auth') && authStore.isLoggedIn) {
-    next({ name: 'Home' })
-  } else {
-    next()
+  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+
+  // 🔥 FIX DO PROFILE
+  if (to.path === '/profile') {
+    if (authStore.user?.username) {
+      return next(`/profile/${authStore.user.username}`)
+    } else {
+      return next('/auth/login')
+    }
   }
+
+  // proteção
+  if (requiresAuth && !authStore.isLoggedIn) {
+    return next('/auth/login')
+  }
+
+  // evitar auth logado
+  if (to.path.startsWith('/auth') && authStore.isLoggedIn) {
+    return next('/')
+  }
+
+  next()
 })
 
 export default router
