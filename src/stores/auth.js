@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
   const error = ref(null)
+  const initialized = ref(false)
 
   // GETTERS
   const user = computed(() => currentUser.value)
@@ -36,8 +37,10 @@ export const useAuthStore = defineStore('auth', () => {
           }
         }
       }
+      initialized.value = true
     } catch (err) {
       error.value = err.message || 'Erro ao inicializar autenticacao'
+      initialized.value = true
     }
   }
 
@@ -97,7 +100,7 @@ export const useAuthStore = defineStore('auth', () => {
         
         currentUser.value = newUser
         
-        // Salvar no localStorage também, incluindo o avatar
+        // Salvar no localStorage tambï¿½m, incluindo o avatar
         localStorage.setItem('user', JSON.stringify({
           ...newUser,
           avatar: newUser.avatar
@@ -116,6 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isLoading,
     error,
+    initialized,
     user,
     isLoggedIn,
     initializeAuth,

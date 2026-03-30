@@ -108,16 +108,12 @@ router.beforeEach(async (to, from, next) => {
     await authStore.initializeAuth()
   }
 
-  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
-
-  // 🔥 FIX DO PROFILE
-  if (to.path === '/profile') {
-    if (authStore.user?.username) {
-      return next(`/profile/${authStore.user.username}`)
-    } else {
-      return next('/auth/login')
-    }
+  // 🔥 TRATA /profile ESPECIALMENTE
+  if (to.path === '/profile' && authStore.isLoggedIn && authStore.user?.username) {
+    return next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
   }
+
+  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
 
   // proteção
   if (requiresAuth && !authStore.isLoggedIn) {
