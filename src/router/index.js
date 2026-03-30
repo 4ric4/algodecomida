@@ -112,20 +112,6 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
-  // Other Routes with MainLayout
-  {
-    path: '/',
-    component: MainLayout,
-    children: [
-      {
-        path: 'notifications',
-        name: 'Notifications',
-        component: NotificationsView,
-        meta: { requiresAuth: true }
-      }
-    ]
-  },
-
   // Fallback
   {
     path: '/:pathMatch(.*)*',
