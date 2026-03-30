@@ -5,12 +5,15 @@ import { authService } from '../services/auth.service'
 import { userService } from '../services/user.service'
 
 export const useAuthStore = defineStore('auth', () => {
-  // STATE
-  const currentUser = ref(null)
-  const isAuthenticated = ref(false)
+  // STATE - RESTAURA DO LOCALSTORAGE IMEDIATAMENTE
+  const token = localStorage.getItem('auth_token')
+  const savedUser = localStorage.getItem('user')
+  
+  const currentUser = ref(savedUser ? new User(JSON.parse(savedUser)) : null)
+  const isAuthenticated = ref(!!token && !!savedUser)
   const isLoading = ref(false)
   const error = ref(null)
-  const initialized = ref(localStorage.getItem('auth_initialized') === 'true')
+  const initialized = ref(!!token)
 
   // GETTERS
   const user = computed(() => currentUser.value)
@@ -18,31 +21,24 @@ export const useAuthStore = defineStore('auth', () => {
 
   // ACTIONS
   async function initializeAuth() {
-    try {
-      const token = localStorage.getItem('auth_token')
-      if (token) {
-        const savedUser = localStorage.getItem('user')
-        if (savedUser) {
-          currentUser.value = new User(JSON.parse(savedUser))
-          isAuthenticated.value = true
-        } else {
-          try {
-            const userData = await userService.getCurrentUser()
-            currentUser.value = new User(userData)
-            isAuthenticated.value = true
-            localStorage.setItem('user', JSON.stringify(userData))
-          } catch (err) {
-            localStorage.removeItem('auth_token')
-            localStorage.removeItem('user')
-          }
-        }
+    // Se já tem token e user, apenas valida com o backend
+    if (token && savedUser) {
+      try {
+        const userData = await userService.getCurrentUser()
+        currentUser.value = new User(userData)
+        isAuthenticated.value = true
+        localStorage.setItem('user', JSON.stringify(userData))
+        initialized.value = true
+      } catch (err) {
+        // Token expirou, limpa
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user')
+        currentUser.value = null
+        isAuthenticated.value = false
+        initialized.value = true
       }
+    } else {
       initialized.value = true
-      localStorage.setItem('auth_initialized', 'true')
-    } catch (err) {
-      error.value = err.message || 'Erro ao inicializar autenticacao'
-      initialized.value = true
-      localStorage.setItem('auth_initialized', 'true')
     }
   }
 
@@ -85,7 +81,8 @@ export const useAuthStore = defineStore('auth', () => {
       currentUser.value = null
       isAuthenticated.value = false
       initialized.value = false
-      localStorage.removeItem('auth_initialized')
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('user')
     }
   }
 
