@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
   const error = ref(null)
-  const initialized = ref(false)
+  const initialized = ref(localStorage.getItem('auth_initialized') === 'true')
 
   // GETTERS
   const user = computed(() => currentUser.value)
@@ -38,9 +38,11 @@ export const useAuthStore = defineStore('auth', () => {
         }
       }
       initialized.value = true
+      localStorage.setItem('auth_initialized', 'true')
     } catch (err) {
       error.value = err.message || 'Erro ao inicializar autenticacao'
       initialized.value = true
+      localStorage.setItem('auth_initialized', 'true')
     }
   }
 
@@ -82,6 +84,8 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       currentUser.value = null
       isAuthenticated.value = false
+      initialized.value = false
+      localStorage.removeItem('auth_initialized')
     }
   }
 
