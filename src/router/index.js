@@ -14,7 +14,6 @@ import DiscoverView from '../views/pages/discover/DiscoverView.vue'
 import RestaurantDetailView from '../views/pages/restaurants/RestaurantDetailView.vue'
 import CreateReviewView from '../views/pages/reviews/CreateReviewView.vue'
 import ProfileView from '../views/pages/profile/ProfileView.vue'
-import ProfileRedirect from '../views/pages/profile/ProfileRedirect.vue'
 import LandingView from '../views/pages/landing/LandingView.vue'
 import FeedView from '../views/pages/feed/FeedView.vue'
 
@@ -57,8 +56,20 @@ const routes = [
   {
     path: '/profile',
     name: 'MyProfile',
-    component: ProfileRedirect
-    // Sem requiresAuth pois o componente cuida disso
+    beforeEnter: (to, from, next) => {
+      const authStore = useAuthStore()
+      
+      // Se tem username, redireciona direto
+      if (authStore.isLoggedIn && authStore.user?.username) {
+        next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
+      } else if (!authStore.isLoggedIn) {
+        // Não logado vai para login
+        next({ name: 'Login' })
+      } else {
+        // Logado mas sem username (improvável), fica esperando
+        next()
+      }
+    }
   },
 
   // Outras páginas
