@@ -14,6 +14,7 @@ import DiscoverView from '../views/pages/discover/DiscoverView.vue'
 import RestaurantDetailView from '../views/pages/restaurants/RestaurantDetailView.vue'
 import CreateReviewView from '../views/pages/reviews/CreateReviewView.vue'
 import ProfileView from '../views/pages/profile/ProfileView.vue'
+import ProfileRedirect from '../views/pages/profile/ProfileRedirect.vue'
 import LandingView from '../views/pages/landing/LandingView.vue'
 import FeedView from '../views/pages/feed/FeedView.vue'
 
@@ -56,23 +57,7 @@ const routes = [
   {
     path: '/profile',
     name: 'MyProfile',
-    beforeEnter: async (to, from, next) => {
-      const authStore = useAuthStore()
-      
-      // Garante que a autenticação foi inicializada
-      if (!authStore.isLoggedIn) {
-        await authStore.initializeAuth()
-      }
-      
-      // Agora redireciona para o perfil do usuário logado
-      if (authStore.isLoggedIn && authStore.user?.username) {
-        console.log('Redirecionando para perfil do usuário:', authStore.user.username)
-        next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
-      } else {
-        console.log('Usuário não autenticado, redirecionando para login')
-        next({ name: 'Login' })
-      }
-    },
+    component: ProfileRedirect,
     meta: { requiresAuth: true }
   },
 
