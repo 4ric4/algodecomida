@@ -56,6 +56,23 @@ const routes = [
   {
     path: '/profile',
     name: 'MyProfile',
+    beforeEnter: async (to, from, next) => {
+      const authStore = useAuthStore()
+      
+      // Garante que a autenticação foi inicializada
+      if (!authStore.isLoggedIn) {
+        await authStore.initializeAuth()
+      }
+      
+      // Agora redireciona para o perfil do usuário logado
+      if (authStore.isLoggedIn && authStore.user?.username) {
+        console.log('Redirecionando para perfil do usuário:', authStore.user.username)
+        next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
+      } else {
+        console.log('Usuário não autenticado, redirecionando para login')
+        next({ name: 'Login' })
+      }
+    },
     meta: { requiresAuth: true }
   },
 
