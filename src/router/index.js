@@ -69,8 +69,28 @@ const routes = [
   },
   {
     path: '/profile',
-    name: 'ProfileCurrent',
-    component: ProfileView,
+    name: 'MyProfile', // Renomeado para clareza
+    beforeEnter: (to, from, next) => {
+      const authStore = useAuthStore()
+      
+      const performRedirect = () => {
+        if (authStore.isLoggedIn && authStore.user?.username) {
+          next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
+        } else {
+          next({ name: 'Login' })
+        }
+      };
+
+      // Se o estado ja foi inicializado, redireciona
+      if (authStore.isLoggedIn) {
+        performRedirect();
+      } else {
+        // Se nao, espera a inicializacao e depois redireciona
+        authStore.initializeAuth().then(() => {
+          performRedirect();
+        });
+      }
+    },
     meta: { requiresAuth: true }
   },
 
