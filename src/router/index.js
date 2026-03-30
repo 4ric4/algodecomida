@@ -57,8 +57,8 @@ const routes = [
   {
     path: '/profile',
     name: 'MyProfile',
-    component: ProfileRedirect,
-    meta: { requiresAuth: true }
+    component: ProfileRedirect
+    // Sem requiresAuth pois o componente cuida disso
   },
 
   // Outras páginas
