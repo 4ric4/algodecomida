@@ -56,8 +56,13 @@ const routes = [
   {
     path: '/profile',
     name: 'MyProfile',
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       const authStore = useAuthStore()
+      
+      // Aguarda inicialização se necessário
+      if (!authStore.initialized) {
+        await authStore.initializeAuth()
+      }
       
       // Se tem username, redireciona direto
       if (authStore.isLoggedIn && authStore.user?.username) {
