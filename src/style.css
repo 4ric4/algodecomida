@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-display {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* No-Line Rule: Use background colors instead of borders */
+.card {
+  @apply bg-surface-container-lowest rounded-roundedness-lg;
+  box-shadow: 0 20px 40px rgba(45, 47, 47, 0.06);
+}
+
+.card-elevated {
+  @apply bg-surface-container-lowest;
+  box-shadow: 0 4px 12px rgba(45, 47, 47, 0.08);
+}
+
+/* Glass effect for floating navigation */
+.glass {
+  @apply bg-surface backdrop-blur-sm;
+  background-color: rgba(246, 246, 246, 0.8);
+}
+
+/* Gradient buttons */
+.btn-primary {
+  @apply bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-roundedness-full px-6 py-3 font-semibold transition-transform hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-surface-container-highest text-on-surface rounded-roundedness-full px-6 py-3 font-semibold transition-transform hover:scale-105;
+}
+
+/* Input fields */
+.input-field {
+  @apply bg-surface-container-low text-on-surface rounded-roundedness-md px-4 py-3 w-full focus:outline-none transition-all;
+  border: 2px solid transparent;
+}
+
+.input-field:focus {
+  @apply bg-surface-container-lowest;
+  border-color: rgba(171, 45, 0, 0.4);
+}
+
+/* Ghost border for accessibility */
+.ghost-border {
+  @apply border-outline-variant;
+  border-color: rgba(172, 173, 173, 0.15);
+}
+
+/* Star rating */
+.star-active {
+  color: #ff5d2b;
+}
+
+.scale-102 {
+  transform: scale(1.02);
+}
