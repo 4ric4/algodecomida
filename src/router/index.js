@@ -99,18 +99,13 @@ const router = createRouter({
   routes
 })
 
-// 🔥 GUARD COMPLETO
+// 🔥 GUARD SIMPLES
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
   // inicializa auth sempre na primeira vez
   if (!authStore.initialized) {
     await authStore.initializeAuth()
-  }
-
-  // 🔥 TRATA /profile ESPECIALMENTE
-  if (to.path === '/profile' && authStore.isLoggedIn && authStore.user?.username) {
-    return next({ name: 'Profile', params: { username: authStore.user.username }, replace: true })
   }
 
   const requiresAuth = to.matched.some(r => r.meta.requiresAuth)

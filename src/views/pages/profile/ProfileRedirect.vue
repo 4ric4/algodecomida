@@ -5,22 +5,36 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../../stores/auth'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const isRedirecting = ref(false)
 
 onMounted(async () => {
-  // Garante que a autenticação foi inicializada
-  if (!authStore.isLoggedIn && localStorage.getItem('auth_token')) {
-    await authStore.initializeAuth()
-  }
+  // Previne múltiplos redirecionamentos
+  if (isRedirecting.value) return
+  isRedirecting.value = true
 
-  // Se logado, redireciona para o perfil do usuário
-  if (authStore.isLoggedIn && authStore.user?.username) {
-    router.replace({ name: 'Profile', params: { username: authStore.user.username } })
-  } else {
-    // Se não logado, redireciona para login
+  try {
+    // Aguarda inicialização se necessário
+    if (!authStore.initialized && localStorage.getItem('auth_token')) {
+      await authStore.initializeAuth()
+    }
+
+    // Aguarda um pouco para garantir que tudo foi carregado
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Se logado e tem username, redireciona
+    if (authStore.isLoggedIn && authStore.user?.username) {
+      console.log('ProfileRedirect: redirecionando para /profile/' + authStore.user.username)
+      router.replace({ name: 'Profile', params: { username: authStore.user.username } })
+    } else if (!authStore.isLoggedIn) {
+      console.log('ProfileRedirect: não autenticado, redirecionando para login')
+      router.replace({ name: 'Login' })
+    }
+  } catch (err) {
+    console.error('ProfileRedirect: erro:', err)
     router.replace({ name: 'Login' })
   }
 })
