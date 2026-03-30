@@ -60,6 +60,20 @@ const routes = [
     meta: { requiresAuth: true }
   },
 
+  // Profile Routes (must be BEFORE wildcard)
+  {
+    path: '/profile/:username',
+    name: 'Profile',
+    component: ProfileView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile',
+    name: 'ProfileCurrent',
+    component: ProfileView,
+    meta: { requiresAuth: true }
+  },
+
   // Dark Pages (Independent routes without MainLayout)
   {
     path: '/discover',
@@ -95,18 +109,6 @@ const routes = [
     path: '/review/new/:restaurantId',
     name: 'CreateReviewForRestaurant',
     component: CreateReviewView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/profile/:username',
-    name: 'Profile',
-    component: ProfileView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/profile',
-    name: 'ProfileCurrent',
-    component: ProfileView,
     meta: { requiresAuth: true }
   },
 
