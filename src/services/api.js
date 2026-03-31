@@ -1,9 +1,9 @@
 import axios from 'axios'
 
-// Configuração da API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+// Configuraï¿½ï¿½o da API
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://algodecomidabackend.vercel.app/api'
 
-// Criar instância do axios
+// Criar instï¿½ncia do axios
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -12,7 +12,7 @@ const api = axios.create({
   }
 })
 
-// Interceptador para adicionar token em todas as requisições
+// Interceptador para adicionar token em todas as requisiï¿½ï¿½es
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
@@ -31,7 +31,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado ou inválido
+      // Token expirado ou invï¿½lido
       localStorage.removeItem('auth_token')
       localStorage.removeItem('user')
       window.location.href = '/auth/login'
