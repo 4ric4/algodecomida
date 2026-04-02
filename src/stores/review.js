@@ -135,17 +135,17 @@ export const useReviewStore = defineStore('review', () => {
       const updatedReviewData = new Review(response)
       
       // Atualizar em reviews
-      const reviewIndex = reviews.value.findIndex(r => r.id === reviewId)
+      const reviewIndex = reviews.value.findIndex(r => r.id === id)
       if (reviewIndex !== -1) {
         reviews.value[reviewIndex] = updatedReviewData
       }
       // Atualizar em userReviews
-      const userReviewIndex = userReviews.value.findIndex(r => r.id === reviewId)
+      const userReviewIndex = userReviews.value.findIndex(r => r.id === id)
       if (userReviewIndex !== -1) {
         userReviews.value[userReviewIndex] = updatedReviewData
       }
       // Atualizar em followingReviews
-      const followingReviewIndex = followingReviews.value.findIndex(r => r.id === reviewId)
+      const followingReviewIndex = followingReviews.value.findIndex(r => r.id === id)
       if (followingReviewIndex !== -1) {
         followingReviews.value[followingReviewIndex] = updatedReviewData
       }
@@ -164,17 +164,17 @@ export const useReviewStore = defineStore('review', () => {
       const updatedReviewData = new Review(response)
       
       // Atualizar em reviews
-      const reviewIndex = reviews.value.findIndex(r => r.id === reviewId)
+      const reviewIndex = reviews.value.findIndex(r => r.id === id)
       if (reviewIndex !== -1) {
         reviews.value[reviewIndex] = updatedReviewData
       }
       // Atualizar em userReviews
-      const userReviewIndex = userReviews.value.findIndex(r => r.id === reviewId)
+      const userReviewIndex = userReviews.value.findIndex(r => r.id === id)
       if (userReviewIndex !== -1) {
         userReviews.value[userReviewIndex] = updatedReviewData
       }
       // Atualizar em followingReviews
-      const followingReviewIndex = followingReviews.value.findIndex(r => r.id === reviewId)
+      const followingReviewIndex = followingReviews.value.findIndex(r => r.id === id)
       if (followingReviewIndex !== -1) {
         followingReviews.value[followingReviewIndex] = updatedReviewData
       }

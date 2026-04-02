@@ -1,7 +1,43 @@
 <template>
   <div class="bg-slate-800/50 backdrop-blur border border-slate-700/50 rounded-lg p-6 hover:border-slate-600 transition">
     <!-- Header: User Info -->
-    <div class="flex justify-between mb-4">
+    <div class="flex justifconst toggleLike = async () => {
+  console.log('❤️ toggleLike - ReviewID:', props.review?.id, 'isLiked:', isLiked.value)
+  
+  if (!props.review?.id) {
+    console.error('❌ Review ID não encontrado')
+    return
+  }
+
+  // Evita múltiplos cliques simultâneos
+  if (isLiking.value) {
+    console.log('⏳ Já está processando like/unlike')
+    return
+  }
+
+  isLiking.value = true
+  
+  try {
+    if (isLiked.value) {
+      // Unlike
+      console.log('💔 Removendo like...')
+      await reviewStore.unlikeReview(props.review.id)
+      console.log('✅ Unlike bem-sucedido')
+    } else {
+      // Like
+      console.log('❤️ Adicionando like...')
+      await reviewStore.likeReview(props.review.id)
+      console.log('✅ Like bem-sucedido')
+    }
+    
+    // Emitir evento para pai atualizar se necessário
+    emit('toggle-like', props.review.id)
+  } catch (error) {
+    console.error('❌ Erro ao fazer toggle de like:', error)
+  } finally {
+    isLiking.value = false
+  }
+}n mb-4">
       <div class="flex items-center gap-3">
         <img
           :src="review.user?.avatar || 'https://via.placeholder.com/40'"
@@ -147,10 +183,17 @@ const currentImageIndex = ref(0)
 const isOwner = computed(() => authStore.user?.id === props.review.userId)
 
 const isLiked = computed(() => {
-  return props.review.likes_by_user === true
+  // Usa userLiked se disponível (novo padrão), senão tenta likes_by_user
+  return props.review.userLiked === true || props.review.likes_by_user === true
 })
 
-const displayedLikes = computed(() => props.review.likes || 0)
+const displayedLikes = computed(() => {
+  // Conta o número de likes
+  if (props.review.likedBy && Array.isArray(props.review.likedBy)) {
+    return props.review.likedBy.length
+  }
+  return props.review.likes || 0
+})
 
 // Log de inicialização
 console.log('✅ ReviewCard montado:', {
